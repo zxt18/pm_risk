@@ -1,0 +1,40 @@
+{% extends "risk/base.html" %}
+
+{% comment %} Loads handsontable's CSS  {% endcomment %}
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.css" />
+{% endblock %}
+
+{% block content %}
+    <div id="hot-table"></div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/16.0.0/handsontable.min.js"></script>
+    <script>
+        const container = document.querySelector('#hot-table');
+
+        const hot = new Handsontable(container, {
+        // theme name with obligatory ht-theme-* prefix
+        themeName: 'ht-theme-main-dark-auto',
+        // other options
+        data: [
+            ['', 'Tesla', 'Volvo', 'Toyota', 'Ford'],
+            ['2019', 10, 11, 12, 13],
+            ['2020', 20, 11, 14, 13],
+            ['2021', 30, 15, 12, 13]
+        ],
+        rowHeaders: true,
+        colHeaders: true,
+        height: 'auto',
+        autoWrapRow: true,
+        autoWrapCol: true,
+        licenseKey: 'non-commercial-and-evaluation' // for non-commercial use only
+        });
+
+
+
+
+
+    </script>
+{% endblock %}
