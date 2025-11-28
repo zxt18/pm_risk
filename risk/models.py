@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
-
 class DailyRisk(models.Model):
     pm = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()

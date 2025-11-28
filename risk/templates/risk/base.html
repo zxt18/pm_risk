@@ -9,12 +9,30 @@
     
     <!-- Common CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+
     
     <!-- IMPORTANT : Allow child templates to add extra CSS -->
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+    {% endblock %}
 </head>
-<body>
-    <nav>...</nav>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <h1>Welwing Capital</h1>
+            </div>
+
+            <!-- User Info (optional) -->
+            <div class="navbar-user">
+                {% if user.is_authenticated %}
+                    <span>Welcome, {{ user.username }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
 
     <!-- Main content goes here -->
     <main>

@@ -67,6 +67,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'pm_risk.wsgi.application'
 
 
