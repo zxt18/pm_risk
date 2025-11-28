@@ -11,3 +11,6 @@ migrations:
 
 migrate : 
 	python manage.py migrate
+
+dummy-data:
+	python manage.py create_dummy_risk_data
