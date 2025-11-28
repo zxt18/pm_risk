@@ -6,18 +6,17 @@
 {% endblock %}
 
 {% block content %}
-    <div id="hot-table"></div>
+    <div id="pm-risk-table"></div>
 {% endblock %}
 
 {% block extra_js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/16.0.0/handsontable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.js"></script>  
     <script>
-        const container = document.querySelector('#hot-table');
+        const container = document.querySelector('#pm-risk-table');
 
         const hot = new Handsontable(container, {
-        // theme name with obligatory ht-theme-* prefix
         themeName: 'ht-theme-main-dark-auto',
-        // other options
+
         data: [
             ['', 'Tesla', 'Volvo', 'Toyota', 'Ford'],
             ['2019', 10, 11, 12, 13],
@@ -27,14 +26,8 @@
         rowHeaders: true,
         colHeaders: true,
         height: 'auto',
-        autoWrapRow: true,
-        autoWrapCol: true,
-        licenseKey: 'non-commercial-and-evaluation' // for non-commercial use only
+        copyPaste:true,
+        licenseKey: 'non-commercial-and-evaluation'
         });
-
-
-
-
-
     </script>
 {% endblock %}
