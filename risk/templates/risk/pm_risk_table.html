@@ -13,21 +13,39 @@
     <script src="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.js"></script>  
     <script>
         const container = document.querySelector('#pm-risk-table');
-
         const hot = new Handsontable(container, {
         themeName: 'ht-theme-main-dark-auto',
-
-        data: [
-            ['', 'Tesla', 'Volvo', 'Toyota', 'Ford'],
-            ['2019', 10, 11, 12, 13],
-            ['2020', 20, 11, 14, 13],
-            ['2021', 30, 15, 12, 13]
-        ],
+        columns: [
+            { data: 'book', title: 'Book' },
+            { data: 'risk', title: 'Risk' },
+            { data: 'target', title: 'Target' },
+            { data: 'stop', title: 'Stop' },
+            { data: 'worst_case_bp', title: 'Worst Case (bp)' },
+            { data: 'worst_case_k', title: 'Worst Case (k)' },
+            { data: 'comment', title: 'Comment on stress estimation' }
+        ],       
+        data: [],
         rowHeaders: true,
         colHeaders: true,
         height: 'auto',
         copyPaste:true,
         licenseKey: 'non-commercial-and-evaluation'
         });
+        
+        // Fetch data from your Django view
+        fetch("{% url 'daily_risk_data' %}")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(records => hot.loadData(records))
+            .catch(error => {
+                console.error('Error loading risk data:', error);
+                // Optional: show user-friendly error in UI
+                alert('Failed to load risk data. Please try again later.');
+            });
     </script>
 {% endblock %}
+k
