@@ -1,0 +1,6 @@
+1) I should refactor the models such that book is its own class.
+# Allows data validation such that books actually exist, and book name can't be simply modified
+# Book table really is static metadata
+# Risk table is a timeseries, that has Book as foreign key
+
+2)
