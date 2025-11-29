@@ -1,7 +1,9 @@
+from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from risk.models import DailyRisk
-from datetime import date, timedelta
+# from datetime import date, timedelta
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = "Create dummy DailyRisk records for testing"
@@ -13,7 +15,8 @@ class Command(BaseCommand):
             defaults={'email': 'zt@gmail.com'}
         )
         
-        dummy_data_today = [
+        DailyRisk.objects.all().delete()
+        dummy_data_1day_ago = [
             {
                 "book": "Emerging Mkts",
                 "risk": 12500.00,
@@ -44,7 +47,7 @@ class Command(BaseCommand):
         ]
         
 
-        dummy_data_past = [
+        dummy_data_2days_ago = [
             {
                 "book": "B1",
                 "risk": 10000.00,
@@ -76,20 +79,20 @@ class Command(BaseCommand):
         
         
         count = 0 
-        for data in dummy_data_today : 
+        for data in dummy_data_1day_ago : 
             obj, created = DailyRisk.objects.get_or_create(
                 pm=user,
-                date=date.today(),
+                date=timezone.localdate()-timedelta(days=1),
                 book=data['book'],
                 defaults=data
             )
             if created : 
                 count +=1
 
-        for data in dummy_data_past : 
+        for data in dummy_data_2days_ago : 
             obj, created = DailyRisk.objects.get_or_create(
                 pm=user,
-                date=date.today()-timedelta(days=1),
+                date=timezone.localdate()-timedelta(days=2),
                 book=data['book'],
                 defaults=data
             )

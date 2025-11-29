@@ -26,10 +26,14 @@ def daily_risk_data(request):
     
 
 def copy_to_today(request):
-    today = timezone.localdate()
-    yesterdate = today - datetime.timedelta(1)
-    qs = DailyRisk.objects.filter(date = yesterdate).values(
-            'book','risk','target','stop','worst_case_bp','worst_case_k','comment'
-        )
+    today = timezone.localdate()  # Respects settings.TIME_ZONE
+    yesterday = today - datetime.timedelta(days=1)
+    
+    qs = DailyRisk.objects.filter(date=yesterday).values(
+        'book', 'risk', 'target', 'stop', 'worst_case_bp', 'worst_case_k', 'comment'
+    )
     data = list(qs)
-    return JsonResponse(data, safe=False)
+    return JsonResponse({
+        'date': today.isoformat(),  # e.g., "2025-11-29"
+        'entries': data
+    })
