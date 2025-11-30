@@ -1,7 +1,9 @@
 {% extends "risk/base.html" %}
+{% load static %}
+
 
 {% block extra_css %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.css">
 {% endblock %}
 
 {% block content %}
@@ -26,11 +28,16 @@
             <input type="date" id="risk-date" name="risk-date" value="{{ today }}">
         </div>
 
-        <!-- Copy Button -->
-        <div>
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 0.5em;">
             <button class="btn" id="copy-to-today-btn">
                 Copy To Today
                 <span id="copy-indicator" style="display: none;">Copying...</span>
+            </button>
+            
+            <button class="btn" id="submit-btn" style="background-color: #28a745; color: white;">
+                Submit
+                <span id="submit-indicator" style="display: none;">Saving...</span>
             </button>
         </div>
     </div>
@@ -38,126 +45,22 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script src="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.js"></script>  
+    <!-- Handsontable library -->
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@16.2.0/dist/handsontable.full.min.js"></script>
+    
+    <!-- Your custom JS -->
+    <script src="{% static 'js/pm_risk_table.js' %}"></script>
+    
+    <!-- Initialize with Django context -->
     <script>
-        const container = document.querySelector('#pm-risk-table');
-        const hot = new Handsontable(container, {
-            themeName: 'ht-theme-main-dark-auto',
-            columns: [
-                { data: 'book_name', title: 'Book', hidden:true},
-                { data: 'risk', title: 'Risk' },
-                { data: 'target', title: 'Target' },
-                { data: 'stop', title: 'Stop' },
-                { data: 'worst_case_bp', title: 'Worst Case (bp)' },
-                { data: 'worst_case_k', title: 'Worst Case (k)' },
-                { data: 'comment', title: 'Comment on stress estimation' }
-            ],       
-            data: [],
-
-            hiddenColumns: {
-                columns: [0],
-            },
-
-            rowHeaders: function(index) {
-                // Try to get book name from current data
-                const rowData = hot.getSourceDataAtRow(index);
-                if (rowData && rowData.book_name) {
-                    return rowData.book_name;
+        document.addEventListener('DOMContentLoaded', function() {
+            initPmRiskTable({
+                today: "{{ today }}",
+                urls: {
+                    dailyRiskData: "{% url 'daily_risk_data' %}",
+                    copyToToday: "{% url 'copy_to_today' %}"
                 }
-                return `Row ${index}`;
-            },
-            rowHeaderWidth: 120,
-            width: '100%',
-            height: 'auto',
-            manualRowMove: false,
-            manualRowResize: true,
-            colHeaders: true,
-            height: 'auto',
-            copyPaste: true,
-            licenseKey: 'non-commercial-and-evaluation'
+            });
         });
-
-
-        function updateRiskTable(data) {
-            hot.loadData(data)
-        }
-
-        // Function to load risk data
-        async function loadRiskData(pm_id, selectedDate = null) {
-            const url = new URL("{% url 'daily_risk_data' %}", window.location.origin);
-
-            url.searchParams.set("pm_id", pm_id)
-
-            if (selectedDate) {
-                url.searchParams.set("date", selectedDate);
-            }
-        
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                updateRiskTable(data);
-            } catch (error) {
-                console.error('Error loading risk data:', error);
-                alert('Failed to load risk data. Please try again later.');
-            }
-        }
-
-
-        // Function to copy to today
-        async function copyToToday(pm_id) {
-            const button = document.getElementById('copy-to-today-btn');
-        
-            button.disabled = true;
-        
-            try {
-                const url = new URL("{% url 'copy_to_today' %}", window.location.origin);
-                url.searchParams.set("pm_id", pm_id)
-                const response  = await fetch(url);
-                const result = await response.json();
-                if (Array.isArray(result.entries) && result.entries.length > 0) {
-                    // Update date input and reload result
-                    
-                    dateInput = document.getElementById('risk-date')
-                    dateInput.value = result.date;
-                    updateRiskTable(result.entries);
-                } else {
-                    alert("No data from yesterday")
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                alert('Failed to load data: ' + error.message);
-            } finally {
-                button.disabled = false;
-            }
-        }
-
-        function getCurrentPmId() {
-            return document.getElementById('pm-selector').value;
-        }
-        // Event listeners
-        document.getElementById('risk-date').addEventListener('change', function() {
-            const pmId = getCurrentPmId();
-            loadRiskData(pmId, this.value);
-        });
-        
-        document.getElementById('copy-to-today-btn').addEventListener('click', function() {
-            const pmId = getCurrentPmId();
-            copyToToday(pmId)
-        });
-        
-        document.getElementById('pm-selector').addEventListener('change', function() {
-            const dateInput = document.getElementById('risk-date');
-
-            // Reset to today's date
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
-        
-            // Reload data for new PM using today's date
-            loadRiskData(this.value, today);
-        })
-        // Load initial data
-        const pmId = getCurrentPmId()
-        loadRiskData(pmId, "{{ today }}");
     </script>
 {% endblock %}

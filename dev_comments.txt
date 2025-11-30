@@ -1,6 +1,11 @@
 1) I should refactor the models such that book is its own class.
 # Allows data validation such that books actually exist, and book name can't be simply modified
-# Book table really is static metadata
+# Book info really is static metadata, maybe should be configured by OPS team ? 
 # Risk table is a timeseries, that has Book as foreign key
 
-2)
+2) Adding of books maybe should be something configured on the admin section, e.g. something that has to through operations ??????
+
+3)Maybe Copy to Today should be copying from the last business day to today ? 
+
+
+4) 

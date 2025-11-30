@@ -38,11 +38,7 @@
     <main>
         {% block content %}
         {% endblock %}
-    </main>
-
-    <!-- Common JS -->
-    <script src="{% static 'js/main.js' %}"></script>
-    
+    </main>    
     <!-- Allow child templates to add extra JS -->
     {% block extra_js %}{% endblock %}
 </body>
