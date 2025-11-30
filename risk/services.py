@@ -2,7 +2,36 @@ from decimal import Decimal
 from django.forms import ValidationError
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models import Max
+
+from risk.utils import _serialize_risks
+
 from .models import Book, DailyRisk
+
+def get_last_risk_data(pm_id, date):
+    '''
+    Fetch risks of the last available date for this pm
+    '''
+    user = User.objects.get(id=pm_id)
+
+    books = Book.objects.filter(
+        pm=user,
+        is_active=True,
+        created_at__lte=date
+    )
+    last_risk_date = (
+        DailyRisk.objects.filter(book__in=books, date__lt=date)
+        .aggregate(last_date=Max('date'))['last_date']
+    )
+    if not last_risk_date:
+        return {}  # no risk data found
+
+    risks = {
+        r.book_id: r
+        for r in DailyRisk.objects.filter(book__in=books, date=last_risk_date)
+    }
+    result = _serialize_risks(books, risks)
+    return result
 
 def fetch_risk_data(pm_id, date):
     user = User.objects.get(id=pm_id)
@@ -16,20 +45,7 @@ def fetch_risk_data(pm_id, date):
         for r in DailyRisk.objects.filter(book__in=books, date=date)
     }
     
-    result = []
-    for book in books:
-        r = risks.get(book.id)
-        # reasonable default values if there is no risk object.
-        result.append({
-            "book_id": book.id,
-            "book_name": book.name,
-            "risk": r.risk if r else None,
-            "target": r.target if r else None,
-            "stop": r.stop if r else None,
-            "worst_case_bp": r.worst_case_bp if r else None,
-            "worst_case_k": r.worst_case_k if r else None,
-            "comment": r.comment if r else None,
-        })
+    result = _serialize_risks(books, risks)
     return result
 
 

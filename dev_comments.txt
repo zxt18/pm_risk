@@ -7,5 +7,6 @@
 
 3)Maybe Copy to Today should be copying from the last business day to today ? 
 
+4) I think I should refactor JS code to a separate file
 
-4) 
+

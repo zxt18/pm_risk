@@ -8,7 +8,7 @@ from django.utils.dateparse import parse_date
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .services import fetch_risk_data, save_risk_data
+from .services import fetch_risk_data, get_last_risk_data, save_risk_data
 
 
 def index(request):
@@ -28,8 +28,7 @@ def daily_risk_data(request):
 def copy_to_today(request):
     pm_id = request.GET.get("pm_id")
     today = timezone.localdate()
-    yesterday = today - datetime.timedelta(days=1)
-    entries = fetch_risk_data(pm_id, yesterday)
+    entries = get_last_risk_data(pm_id, today)
     return JsonResponse({
         "date": today.isoformat(),
         "entries": entries
