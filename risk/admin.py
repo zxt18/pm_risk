@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Book, DailyRisk
+from django.contrib.auth.admin import UserAdmin
+from .models import Book, BookPermission, DailyRisk, User
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -28,3 +29,49 @@ class DailyRiskAdmin(admin.ModelAdmin):
         return obj.book.pm.username
     pm_name.admin_order_field = 'book__pm__username'
     pm_name.short_description = 'PM'
+
+@admin.register(BookPermission)
+class BookPermissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'pm', 'permission')
+    list_filter = ('permission', 'pm', 'user')
+    search_fields = ('user__username', 'pm__username')
+    autocomplete_fields = ('user', 'pm')
+
+
+class BookPermissionInline(admin.TabularInline):
+    model = BookPermission
+    extra = 0
+    autocomplete_fields = ('pm',)
+    fk_name = "user"
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'is_staff', 'pm_permissions')
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
+        
+        ('PM Permissions', {
+            'fields': ('can_edit_all_pms',),
+        }),
+    )
+
+    inlines = [BookPermissionInline]
+
+    def pm_permissions(self, obj):
+        if obj.can_edit_all_pms:
+            return "EDIT ALL"
+
+        perms = (
+            BookPermission.objects
+            .filter(user=obj)
+            .select_related("pm")
+        )
+        if not perms.exists():
+            return "—"
+
+        return ", ".join(f"{p.pm.username} ({p.permission})" for p in perms)
+
+    pm_permissions.short_description = "PM Permissions"

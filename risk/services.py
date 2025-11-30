@@ -1,6 +1,4 @@
-from decimal import Decimal
 from django.forms import ValidationError
-from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models import Max
 
@@ -8,14 +6,13 @@ from risk.utils import _serialize_risks
 
 from .models import Book, DailyRisk
 
-def get_last_risk_data(pm_id, date):
+def get_last_risk_data(pm, date):
     '''
     Fetch risks of the last available date for this pm
     '''
-    user = User.objects.get(id=pm_id)
 
     books = Book.objects.filter(
-        pm=user,
+        pm=pm,
         is_active=True,
         created_at__lte=date
     )
@@ -33,10 +30,9 @@ def get_last_risk_data(pm_id, date):
     result = _serialize_risks(books, risks)
     return result
 
-def fetch_risk_data(pm_id, date):
-    user = User.objects.get(id=pm_id)
+def fetch_risk_data(pm, date):
     books = Book.objects.filter(
-        pm=user,
+        pm=pm,
         is_active=True,
         created_at__lte=date
     )

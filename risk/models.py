@@ -1,6 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+
+
+
+class User(AbstractUser):
+    can_edit_all_pms = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.username
+
 class Book(models.Model):
     pm = models.ForeignKey(User, on_delete=models.CASCADE, related_name="books")
     name = models.CharField(max_length=80)
@@ -35,4 +44,18 @@ class DailyRisk(models.Model):
     def __str__(self):
         return f"{self.book.pm.username} | {self.date} | {self.book.name}"
     
-    
+class BookPermission(models.Model):
+    VIEW = "view"
+    EDIT = "edit"
+
+    PERMISSION_CHOICES = [
+        (VIEW, "View"),
+        (EDIT, "Edit"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pm = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pm_permissions")
+    permission = models.CharField(max_length=10, choices=PERMISSION_CHOICES)
+
+    class Meta:
+        unique_together = ("user", "pm", "permission")

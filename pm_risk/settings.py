@@ -81,6 +81,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'risk.User'  # or whatever your app name is
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

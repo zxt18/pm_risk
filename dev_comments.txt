@@ -3,10 +3,16 @@
 # Book info really is static metadata, maybe should be configured by OPS team ? 
 # Risk table is a timeseries, that has Book as foreign key
 
-2) Adding of books maybe should be something configured on the admin section, e.g. something that has to through operations ??????
+2)Adding of books maybe should be something configured on the admin section, e.g. something that has to through operations ??????
 
 3)Maybe Copy to Today should be copying from the last business day to today ? 
 
-4) I think I should refactor JS code to a separate file
+4)I think I should refactor JS code to a separate file
+
+5)We should always prefer server-side validation !
+
+6)Each user gets to be assigned to a PM book permission VIEW,EDIT , this is a many to many field.
+
+7)We should define our own CustomUser class, and assign a boolean to view/edit/all.
 
 

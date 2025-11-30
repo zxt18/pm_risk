@@ -5,8 +5,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date
-from django.contrib.auth.models import User
+from .models import User
 from django.utils import timezone
+
+from risk.utils import user_can_edit_pm, user_can_view_pm
 
 from .services import fetch_risk_data, get_last_risk_data, save_risk_data
 
@@ -21,14 +23,19 @@ def index(request):
 def daily_risk_data(request):
     pm_id = request.GET.get("pm_id")
     date = parse_date(request.GET.get("date")) or timezone.localdate()
-    result = fetch_risk_data(pm_id, date)
-    return JsonResponse(result, safe=False)
+    pm = User.objects.get(id=pm_id)
+    if user_can_view_pm(request.user,pm): 
+        result = fetch_risk_data(pm, date)
+        return JsonResponse(result, safe=False)
+    else : 
+        return JsonResponse({"error": f"{request.user.username} does not have permissions to view {pm.username}'s books"}, status=500)
 
 
 def copy_to_today(request):
     pm_id = request.GET.get("pm_id")
     today = timezone.localdate()
-    entries = get_last_risk_data(pm_id, today)
+    pm = User.objects.get(id=pm_id)
+    entries = get_last_risk_data(pm, today)
     return JsonResponse({
         "date": today.isoformat(),
         "entries": entries
@@ -46,12 +53,14 @@ def submit_risk_data(request):
         if not pm_id or not date:
             return JsonResponse({"error": "pm_id and date required"}, status=400)
 
-        if date < timezone.localdate():
-            return JsonResponse({"error": "You can't edit the past"}, status=400)  
-
         pm = User.objects.get(id=pm_id)
-        save_risk_data(pm, date, entries)
+        if user_can_edit_pm(request.user,pm) : 
+            if date < timezone.localdate():
+                return JsonResponse({"error": "You can't edit the past"}, status=400)  
 
-        return JsonResponse({"message": "Saved successfully!"})
+            save_risk_data(pm, date, entries)
+            return JsonResponse({"message": "Saved successfully!"})
+        else : 
+            return JsonResponse({"error": f"{request.user} does not have permissions to edit {pm}'s books"}, status=500)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)

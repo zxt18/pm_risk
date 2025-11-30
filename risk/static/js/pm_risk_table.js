@@ -57,22 +57,30 @@ function getCurrentPmId() {
     return document.getElementById('pm-selector').value;
 }
 
+async function apiFetch(url, options = {}) {
+    try {
+        const res = await fetch(url, options);
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+            const msg = data.error || `Request failed (${res.status})`;
+            throw new Error(msg);
+        }
+
+        return data;
+    } catch (err) {
+        alert(err.message || "Network error");
+        throw err;
+    }
+}
+
 async function loadRiskData(pmId, selectedDate = null) {
     const url = new URL(urls.dailyRiskData, window.location.origin);
     url.searchParams.set("pm_id", pmId);
-    if (selectedDate) {
-        url.searchParams.set("date", selectedDate);
-    }
+    if (selectedDate) url.searchParams.set("date", selectedDate);
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        hot.loadData(data);
-    } catch (error) {
-        console.error('Error loading risk data:', error);
-        alert('Failed to load risk data. Please try again later.');
-    }
+    const result = await apiFetch(url);
+    hot.loadData(result);
 }
 
 async function copyToToday() {
@@ -83,8 +91,8 @@ async function copyToToday() {
     try {
         const url = new URL(urls.copyToToday, window.location.origin);
         url.searchParams.set("pm_id", pmId);
-        const response = await fetch(url);
-        const result = await response.json();
+
+        const result = await apiFetch(url);
 
         if (Array.isArray(result.entries) && result.entries.length > 0) {
             document.getElementById('risk-date').value = result.date;
@@ -92,9 +100,6 @@ async function copyToToday() {
         } else {
             alert("No data from yesterday");
         }
-    } catch (error) {
-        console.error('Error copying to today:', error);
-        alert('Failed to copy data: ' + error.message);
     } finally {
         button.disabled = false;
     }
@@ -130,14 +135,11 @@ function loadInitialData() {
 async function handleSubmit() {
     const pmId = getCurrentPmId();
     const selectedDate = document.getElementById('risk-date').value;
-    const records = hot.getSourceData();
-    if (!selectedDate) {
-        alert("Please choose a date");
-        return;
-    }
 
-    const cleanedRecords = records.map(r => ({
-        book_id: r.book_id,         
+    if (!selectedDate) return alert("Please choose a date");
+
+    const cleaned = hot.getSourceData().map(r => ({
+        book_id: r.book_id,
         risk: r.risk || null,
         target: r.target || null,
         stop: r.stop || null,
@@ -146,33 +148,17 @@ async function handleSubmit() {
         comment: r.comment || null,
     }));
 
-    console.log("Submitting:", cleanedRecords);
+    await apiFetch(urls.submitRiskData, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            pm_id: pmId,
+            date: selectedDate,
+            entries: cleaned
+        })
+    });
 
-    try {
-        const response = await fetch(urls.submitRiskData, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                pm_id: pmId,
-                date: selectedDate,
-                entries: cleanedRecords
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            alert("Error: " + result.error);
-            return;
-        }
-
-        alert("Saved successfully!");
-
-    } catch (err) {
-        alert("Failed to submit data"+ err);
-    }
+    alert("Saved successfully!");
 }
 
 window.initPmRiskTable = initPmRiskTable;
