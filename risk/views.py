@@ -1,6 +1,7 @@
 import datetime
 import json
-from django.shortcuts import render
+from django.conf import settings
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -64,3 +65,28 @@ def submit_risk_data(request):
             return JsonResponse({"error": f"{request.user} does not have permissions to edit {pm}'s books"}, status=500)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+
+
+# LOGIN code
+from django.contrib.auth import login,logout
+from django.contrib.auth.forms import AuthenticationForm
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+
+    form = AuthenticationForm(request, data=request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            next_url = request.GET.get("next") or settings.LOGIN_REDIRECT_URL
+            return redirect(next_url)
+
+    return render(request, "risk/login.html", {"form": form})
+
+def logout_view(request):
+    logout(request)
+    return redirect(settings.LOGIN_URL)
