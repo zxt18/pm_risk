@@ -20,7 +20,6 @@ def index(request):
 
 def daily_risk_data(request):
     pm_id = request.GET.get("pm_id")
-
     date = parse_date(request.GET.get("date")) or timezone.localdate()
     result = fetch_risk_data(pm_id, date)
     return JsonResponse(result, safe=False)
@@ -36,7 +35,6 @@ def copy_to_today(request):
         "entries": entries
     })
 
-
 @require_POST
 @csrf_exempt
 def submit_risk_data(request):
@@ -48,6 +46,9 @@ def submit_risk_data(request):
 
         if not pm_id or not date:
             return JsonResponse({"error": "pm_id and date required"}, status=400)
+
+        if date < timezone.localdate():
+            return JsonResponse({"error": "You can't edit the past"}, status=400)  
 
         pm = User.objects.get(id=pm_id)
         save_risk_data(pm, date, entries)

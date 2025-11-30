@@ -19,7 +19,7 @@ def fetch_risk_data(pm_id, date):
     result = []
     for book in books:
         r = risks.get(book.id)
-
+        # reasonable default values if there is no risk object.
         result.append({
             "book_id": book.id,
             "book_name": book.name,
