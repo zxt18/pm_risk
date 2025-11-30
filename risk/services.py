@@ -19,16 +19,16 @@ def fetch_risk_data(pm_id, date):
     result = []
     for book in books:
         r = risks.get(book.id)
+
         result.append({
             "book_id": book.id,
             "book_name": book.name,
-            "risk": float(r.risk) if r else None,
-            "target": float(r.target) if r else None,
-            "stop": float(r.stop) if r else None,
-            "worst_case_bp": float(r.worst_case_bp) if r else None,
-            "worst_case_k": float(r.worst_case_k) if r else None,
-            "comment": r.comment if r else "",
-            "has_data": r is not None,
+            "risk": r.risk if r else None,
+            "target": r.target if r else None,
+            "stop": r.stop if r else None,
+            "worst_case_bp": r.worst_case_bp if r else None,
+            "worst_case_k": r.worst_case_k if r else None,
+            "comment": r.comment if r else None,
         })
     return result
 

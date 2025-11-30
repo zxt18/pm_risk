@@ -112,6 +112,7 @@ function bindEventListeners() {
         const newPmId = this.value;
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('risk-date').value = today;
+        loadRiskData(newPmId, today)
     });
 
     // Submit button handler
