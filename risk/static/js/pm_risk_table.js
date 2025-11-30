@@ -21,7 +21,7 @@ function initHandsontable() {
         columns: [{
             data: 'book_name',
             title: 'Book',
-            hidden: true
+            readOnly: true,
         }, {
             data: 'risk',
             title: 'Risk'
@@ -42,11 +42,6 @@ function initHandsontable() {
             title: 'Comment on stress estimation'
         }],
         data: [],
-        rowHeaders: function(index) {
-            const rowData = hot.getSourceDataAtRow(index);
-            return (rowData?.book_name) || `Row ${index}`;
-        },
-        rowHeaderWidth: 120,
         width: '100%',
         height: 'auto',
         manualRowMove: false,
@@ -131,16 +126,52 @@ function loadInitialData() {
     loadRiskData(pmId, todayDate);
 }
 
-function handleSubmit() {
+async function handleSubmit() {
     const pmId = getCurrentPmId();
-    const records = hot.getSourceData();
     const selectedDate = document.getElementById('risk-date').value;
+    const records = hot.getSourceData();
+    if (!selectedDate) {
+        alert("Please choose a date");
+        return;
+    }
 
-    console.log('Submit:', {
-        pmId: pmId,
-        date: selectedDate,
-        records
-    });
+    const cleanedRecords = records.map(r => ({
+        book_id: r.book_id,         
+        risk: r.risk || null,
+        target: r.target || null,
+        stop: r.stop || null,
+        worst_case_bp: r.worst_case_bp || null,
+        worst_case_k: r.worst_case_k || null,
+        comment: r.comment || null,
+    }));
+
+    console.log("Submitting:", cleanedRecords);
+
+    try {
+        const response = await fetch(urls.submitRiskData, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                pm_id: pmId,
+                date: selectedDate,
+                entries: cleanedRecords
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert("Error: " + result.error);
+            return;
+        }
+
+        alert("Saved successfully!");
+
+    } catch (err) {
+        alert("Failed to submit data"+ err);
+    }
 }
 
 window.initPmRiskTable = initPmRiskTable;

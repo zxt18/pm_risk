@@ -19,13 +19,13 @@ class DailyRisk(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="daily_risks")
     
     # Daily values
-    risk = models.DecimalField(max_digits=12, decimal_places=2)
+    risk = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     target = models.DecimalField(max_digits=12, decimal_places=2, null=True,blank=True)
     stop = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     worst_case_bp = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     worst_case_k = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     
-    comment = models.TextField(blank=True)
+    comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
