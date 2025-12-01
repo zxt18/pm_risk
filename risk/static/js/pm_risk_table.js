@@ -42,12 +42,14 @@ function initHandsontable() {
             title: 'Comment on stress estimation'
         }],
         data: [],
-        width: '100%',
+        width: '95%',
         height: 'auto',
         manualRowMove: false,
         manualRowResize: true,
         colHeaders: true,
+        stretchH: 'last',
         copyPaste: true,
+        manualColumnResize: true,
         licenseKey: 'non-commercial-and-evaluation'
     });
 }

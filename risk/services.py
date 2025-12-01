@@ -1,11 +1,11 @@
 from django.forms import ValidationError
 from django.contrib.auth.models import User
 from django.db.models import Max
-
 from risk.utils import _serialize_risks
-
 from .models import Book, DailyRisk
+import logging
 
+LOG  = logging.getLogger(__name__)
 def get_last_risk_data(pm, date):
     '''
     Fetch risks of the last available date for this pm
@@ -87,7 +87,7 @@ def save_risk_data(pm, date, entries):
         date=date,
         book__pm=pm
     ).delete()
-    print(
+    LOG.info(
         f"date={date}, book_ids={book_ids}"
     )
     DailyRisk.objects.bulk_create(validated_objects)

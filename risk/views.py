@@ -10,7 +10,6 @@ from .models import User
 from django.utils import timezone
 
 from risk.utils import user_can_edit_pm, user_can_view_pm
-
 from .services import fetch_risk_data, get_last_risk_data, save_risk_data
 
 
