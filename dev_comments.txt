@@ -16,3 +16,11 @@
 7)We should define our own CustomUser class, and assign a boolean to view/edit/all.
 
 
+
+
+FUTURE : 
+1) Move SQLite DB to PostgreSQL for more production ready DB
+2) Containerise using Docker (For Deplyoment and Repoducibility)
+3) Add Vite (Hot module reloading and optimised bundling for static assets)
+4) 
+
