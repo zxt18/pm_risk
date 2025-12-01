@@ -35,11 +35,16 @@ def copy_to_today(request):
     pm_id = request.GET.get("pm_id")
     today = timezone.localdate()
     pm = User.objects.get(id=pm_id)
-    entries = get_last_risk_data(pm, today)
-    return JsonResponse({
-        "date": today.isoformat(),
-        "entries": entries
-    })
+    if user_can_edit_pm(request.user, pm): 
+        entries = get_last_risk_data(pm, today)
+        return JsonResponse({
+            "date": today.isoformat(),
+            "entries": entries
+        })
+    else : 
+        return JsonResponse({"error": f"{request.user} does not have permissions to view {pm}'s books"}, status=500)
+
+
 
 @require_POST
 @csrf_exempt
