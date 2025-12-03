@@ -100,7 +100,7 @@ async function copyToToday() {
             document.getElementById('risk-date').value = result.date;
             hot.loadData(result.entries);
         } else {
-            alert("No data from yesterday");
+            alert("No data from last business day");
         }
     } finally {
         button.disabled = false;

@@ -6,6 +6,7 @@ from .models import Book, DailyRisk
 import logging
 
 LOG  = logging.getLogger(__name__)
+
 def get_last_risk_data(pm, date):
     '''
     Fetch risks of the last available date for this pm
