@@ -12,7 +12,7 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(DailyRisk)
 class DailyRiskAdmin(admin.ModelAdmin):
-    list_display = ( 'date','pm_name','book_name', 'risk', 'target', 'stop')
+    list_display = ( 'date','pm_name','book_name', 'risk', 'target', 'stop','worst_case_bp','worst_case_k')
     list_filter = ('date', 'book__pm', 'book__name')
     search_fields = ('book__name', 'book__pm__username', 'comment')
     date_hierarchy = 'date'
