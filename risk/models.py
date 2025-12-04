@@ -45,7 +45,7 @@ class DailyRisk(models.Model):
     def __str__(self):
         return f"{self.book.pm.username} | {self.date} | {self.book.name}"
     
-class BookPermission(models.Model):
+class PMPermission(models.Model):
     VIEW = "view"
     EDIT = "edit"
 

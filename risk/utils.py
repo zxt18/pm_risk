@@ -1,4 +1,4 @@
-from risk.models import BookPermission, User
+from risk.models import PMPermission, User
 
 
 def _serialize_risks(books, risks):
@@ -23,18 +23,18 @@ def _serialize_risks(books, risks):
 def user_can_edit_pm(user : User, pm):
     if user.can_edit_all_pms or user == pm: 
         return True
-    return BookPermission.objects.filter(
+    return PMPermission.objects.filter(
         user=user,
         pm=pm,
-        permission=BookPermission.EDIT
+        permission=PMPermission.EDIT
     ).exists()
 
 def user_can_view_pm(user : User, pm):
     if user == pm or user.can_view_all_pms or user.can_edit_all_pms:
         return True
-    return BookPermission.objects.filter(
+    return PMPermission.objects.filter(
         user=user,
         pm=pm,
-        permission__in=[BookPermission.VIEW, BookPermission.EDIT]
+        permission__in=[PMPermission.VIEW, PMPermission.EDIT]
     ).exists()
   

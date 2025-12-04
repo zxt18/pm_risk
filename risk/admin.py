@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Book, BookPermission, DailyRisk, User
+from .models import Book, PMPermission, DailyRisk, User
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -30,16 +30,16 @@ class DailyRiskAdmin(admin.ModelAdmin):
     pm_name.admin_order_field = 'book__pm__username'
     pm_name.short_description = 'PM'
 
-@admin.register(BookPermission)
-class BookPermissionAdmin(admin.ModelAdmin):
+@admin.register(PMPermission)
+class PMPermissionAdmin(admin.ModelAdmin):
     list_display = ('user', 'pm', 'permission')
     list_filter = ('permission', 'pm', 'user')
     search_fields = ('user__username', 'pm__username')
     autocomplete_fields = ('user', 'pm')
 
 
-class BookPermissionInline(admin.TabularInline):
-    model = BookPermission
+class PMPermissionInline(admin.TabularInline):
+    model = PMPermission
     extra = 0
     autocomplete_fields = ('pm',)
     fk_name = "user"
@@ -58,14 +58,14 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
 
-    inlines = [BookPermissionInline]
+    inlines = [PMPermissionInline]
 
     def pm_permissions(self, obj):
         if obj.can_edit_all_pms:
             return "EDIT ALL"
 
         perms = list(
-            BookPermission.objects
+            PMPermission.objects
             .filter(user=obj)
             .select_related("pm")
         )

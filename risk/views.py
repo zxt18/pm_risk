@@ -42,7 +42,7 @@ def copy_to_today(request):
             "entries": entries
         })
     else : 
-        return JsonResponse({"error": f"{request.user} does not have permissions to view {pm}'s books"}, status=500)
+        return JsonResponse({"error": f"{request.user} does not have permissions to edit {pm}'s books"}, status=500)
 
 
 

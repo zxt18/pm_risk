@@ -22,5 +22,6 @@ FUTURE :
 1) Move SQLite DB to PostgreSQL for more production ready DB
 2) Containerise using Docker (For Deplyoment and Repoducibility)
 3) Add Vite (Hot module reloading and optimised bundling for static assets)
-4) 
+4) Comprehensive testing of each endpoint
+5)
 
