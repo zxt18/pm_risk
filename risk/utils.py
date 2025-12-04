@@ -21,7 +21,7 @@ def _serialize_risks(books, risks):
     return result
 
 def user_can_edit_pm(user : User, pm):
-    if user.can_edit_all_pms or user == pm : 
+    if user.can_edit_all_pms or user == pm: 
         return True
     return BookPermission.objects.filter(
         user=user,
@@ -30,7 +30,7 @@ def user_can_edit_pm(user : User, pm):
     ).exists()
 
 def user_can_view_pm(user : User, pm):
-    if user == pm or user.can_edit_all_pms:
+    if user == pm or user.can_view_all_pms or user.can_edit_all_pms:
         return True
     return BookPermission.objects.filter(
         user=user,

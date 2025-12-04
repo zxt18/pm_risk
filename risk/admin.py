@@ -54,7 +54,7 @@ class CustomUserAdmin(UserAdmin):
         ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
         
         ('PM Permissions', {
-            'fields': ('can_edit_all_pms',),
+            'fields': ('can_edit_all_pms','can_view_all_pms'),
         }),
     )
 
@@ -64,14 +64,27 @@ class CustomUserAdmin(UserAdmin):
         if obj.can_edit_all_pms:
             return "EDIT ALL"
 
-        perms = (
+        perms = list(
             BookPermission.objects
             .filter(user=obj)
             .select_related("pm")
         )
-        if not perms.exists():
+
+        if not perms and not obj.can_view_all_pms:
             return "—"
 
-        return ", ".join(f"{p.pm.username} ({p.permission})" for p in perms)
+        if obj.can_view_all_pms:
+            class _FakePerm:
+                pm = type("P", (), {"username": ""})()
+                permission = "VIEW ALL"
+            perms.append(_FakePerm())
+
+        if perms:
+            return ", ".join(
+                f"{p.pm.username} ({p.permission})"
+                for p in perms
+            )
+
+        return ""
 
     pm_permissions.short_description = "PM Permissions"
